@@ -1,0 +1,930 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Test Interactiu LAB_PI 2016 (Complet)</title>
+  <style>
+    body { font-family: 'Segoe UI', Arial, sans-serif; background: #f5f5f5; margin: 0; padding: 0; }
+    .container { max-width: 680px; margin: 0 auto; padding: 16px; background: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.09); border-radius: 11px; margin-top: 18px;}
+    .question { font-size: 1.12em; margin-bottom: 14px; font-weight: 500;}
+    .answers label { display: block; margin-bottom: 10px; cursor: pointer; padding: 8px 12px; border-radius: 6px; transition: background 0.2s;}
+    .answers input[type="radio"] { margin-right: 8px; }
+    .answers label.selected { background: #e8f0fe; }
+    .btn { background: #1976d2; color: #fff; border: none; padding: 10px 22px; border-radius: 6px; font-size: 1em; margin-top: 14px; cursor: pointer;}
+    .btn:disabled { background: #cccccc; cursor: not-allowed;}
+    .feedback { margin-top: 18px; padding: 12px; border-radius: 7px; font-size: 1em;}
+    .correct { background: #c8e6c9; color: #205220; }
+    .incorrect { background: #ffcdd2; color: #b71c1c; }
+    .explicacio { margin-top: 7px; font-style: italic; color: #444; }
+    .indice { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+    .indice button { border: 1px solid #1976d2; background: #fff; color: #1976d2; border-radius: 4px; padding: 4px 10px; cursor: pointer; transition: background 0.2s;}
+    .indice button.current { background: #1976d2; color: #fff;}
+    .indice .sep { padding: 0 7px; font-weight: bold; color: #444; border:none; background:transparent; cursor:default;}
+    .final-summary { margin-top: 22px; padding: 15px; background: #e3f2fd; border-radius: 8px; }
+    @media (max-width: 600px) { .container { margin-top: 8px; padding: 7px; } }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Test interactiu LAB_PI 2016 <span style="font-size:0.7em;color:#1976d2;">(Complet)</span></h2>
+    <div class="indice" id="indice"></div>
+    <div id="quiz"></div>
+    <div id="summary" style="display:none;"></div>
+  </div>
+  <script>
+    // --- INICI: BANCO DE PREGUNTES ---
+    const preguntes = [
+      // --------------- TEST 1 - 50 ---------------
+      {
+        enunciat: "1. La via d'accés sanguini que s'utilitza amb més freqüència en l'obtenció de mostres per al laboratori és:",
+        opcions: [
+          "La via venosa",
+          "La via arterial",
+          "La via capil·lar",
+          "La via central"
+        ],
+        correcta: 0,
+        explicacio: "La via venosa és la més utilitzada perquè és accessible, permet obtenir quantitats suficients de sang i el risc per al pacient és baix."
+      },
+      {
+        enunciat: "2. Quina de les següents situacions pot donar un fals augment de la glucosa a la sang?",
+        opcions: [
+          "Compressió prolongada amb el torniquet",
+          "Emol·lisi de la mostra",
+          "Mantenir la mostra a temperatura ambient molta estona",
+          "Ús d'una agulla de petit calibre"
+        ],
+        correcta: 0,
+        explicacio: "La compressió prolongada amb el torniquet provoca estasi venosa, concentrant la glucosa i altres soluts, podent donar valors falsament elevats."
+      },
+      {
+        enunciat: "3. Quina de les següents NO és una complicació immediata de la punció venosa?",
+        opcions: [
+          "Infecció local",
+          "Hematoma",
+          "Dolor",
+          "Síncope"
+        ],
+        correcta: 0,
+        explicacio: "La infecció local sol aparèixer dies després; les complicacions immediates són l'hematoma, el dolor i el síncope."
+      },
+      {
+        enunciat: "4. Quina d’aquestes pràctiques contribueix a la prevenció de l'hemòlisi en una mostra de sang?",
+        opcions: [
+          "Utilitzar una xeringa de gran calibre",
+          "Agitar fortament el tub amb la mostra",
+          "Deixar la mostra exposada a la llum",
+          "Utilitzar un torniquet durant més de 2 minuts"
+        ],
+        correcta: 0,
+        explicacio: "L’ús d’una xeringa de gran calibre redueix la força d’aspiració i el risc d’hemòlisi; la resta són pràctiques que la poden afavorir."
+      },
+      {
+        enunciat: "5. Per evitar errors en l’etiquetatge de mostres de laboratori, el més important és:",
+        opcions: [
+          "Identificar el pacient abans de l’extracció",
+          "Etiquetar totes les mostres juntes al final",
+          "Utilitzar inicials en comptes de nom i cognoms",
+          "Delegar sempre la tasca a un altre professional"
+        ],
+        correcta: 0,
+        explicacio: "La correcta identificació del pacient abans de l’extracció és fonamental per garantir la traçabilitat i seguretat."
+      },
+      {
+        enunciat: "6. Quina d’aquestes NO és una norma bàsica d’higiene de mans?",
+        opcions: [
+          "Utilitzar joies durant l’activitat assistencial",
+          "Rentat abans i després de l’atenció a cada pacient",
+          "Assecar bé les mans després de rentar-les",
+          "Utilitzar solució hidroalcohòlica en absència de brutícia visible"
+        ],
+        correcta: 0,
+        explicacio: "L’ús de joies està contraindicat; dificulta la higiene i pot ser font de contaminació."
+      },
+      {
+        enunciat: "7. Quin dels següents NO és un EPI (Equip de Protecció Individual) habitual en extracció sanguínia?",
+        opcions: [
+          "Bata d’un sol ús",
+          "Guants",
+          "Mascarilla",
+          "Sandàlies"
+        ],
+        correcta: 3,
+        explicacio: "Les sandàlies no són un EPI; la resta són habituals en pràctiques d’extracció."
+      },
+      {
+        enunciat: "8. En cas de punció accidental amb agulla contaminada, el primer que cal fer és:",
+        opcions: [
+          "Rentat immediat amb aigua i sabó",
+          "Anar directament a la consulta mèdica",
+          "Presionar amb cotó sec sense rentar",
+          "Esperar per veure si surt sang"
+        ],
+        correcta: 0,
+        explicacio: "La primera actuació sempre és rentar amb aigua i sabó per reduir la càrrega patògena abans d'altres mesures."
+      },
+      {
+        enunciat: "9. Quin paràmetre analític s’alteraria més si la mostra presenta hemòlisi?",
+        opcions: [
+          "Potassi",
+          "Colesterol",
+          "Glucosa",
+          "Calci"
+        ],
+        correcta: 0,
+        explicacio: "La hemòlisi allibera potassi dels eritòcits, produint un augment fals en la determinació."
+      },
+      {
+        enunciat: "10. La utilització d’agulles de diàmetre molt petit pot provocar:",
+        opcions: [
+          "Hemòlisi",
+          "Hemoconcentració",
+          "Augment de la glucosa",
+          "Disminució del potassi"
+        ],
+        correcta: 0,
+        explicacio: "Les agulles molt fines generen més turbulències i poden provocar la ruptura dels glòbuls vermells (hemòlisi)."
+      },
+      {
+        enunciat: "11. El recipient adequat per a la recollida d'orina per urocultiu és:",
+        opcions: [
+          "Esterilitzat i tapat",
+          "De plàstic de qualsevol tipus",
+          "Sense tap",
+          "D'alumini"
+        ],
+        correcta: 0,
+        explicacio: "Per evitar contaminacions, l'orina per a urocultiu s'ha de recollir en un recipient esterilitzat i tapat."
+      },
+      {
+        enunciat: "12. Quina de les següents mostres s'ha de processar més ràpidament al laboratori?",
+        opcions: [
+          "Gasometria arterial",
+          "Orina per analítica rutinària",
+          "Sang per hemograma",
+          "Líquid sinovial"
+        ],
+        correcta: 0,
+        explicacio: "La gasometria arterial s'ha d'analitzar immediatament per evitar alteracions en els resultats degudes al temps d'espera."
+      },
+      {
+        enunciat: "13. Per la recollida de frotis faríngi, la mostra s'ha de prendre:",
+        opcions: [
+          "Abans d'iniciar tractament antibiòtic",
+          "Després de l'antibioteràpia",
+          "Amb qualsevol tipus de hisop",
+          "Només a pacients simptomàtics"
+        ],
+        correcta: 0,
+        explicacio: "El frotis faríngi sempre s'ha de prendre abans de començar el tractament antibiòtic per evitar falsos negatius."
+      },
+      {
+        enunciat: "14. Per obtenir una mostra d'esput de qualitat per microbiologia, el pacient ha de:",
+        opcions: [
+          "Rentar-se la boca amb aigua abans de la recollida",
+          "Menjar abans de recollir la mostra",
+          "Usar col·lutori bucal",
+          "Recollir l'esput durant qualsevol moment del dia"
+        ],
+        correcta: 0,
+        explicacio: "Rentar-se la boca amb aigua redueix la contaminació per flora oral i millora la qualitat de la mostra d'esput."
+      },
+      {
+        enunciat: "15. Quina és la millor manera de conservar una mostra d'orina si no pot ser analitzada immediatament?",
+        opcions: [
+          "Refrigerar-la a 4ºC",
+          "Deixar-la a temperatura ambient",
+          "Congelar-la",
+          "Afegir sucre com a conservant"
+        ],
+        correcta: 0,
+        explicacio: "Refrigerar la mostra d'orina a 4ºC impedeix la proliferació bacteriana i la degradació dels soluts."
+      },
+      {
+        enunciat: "16. Quina acció NO ajuda a evitar errors en la recollida de mostres de laboratori?",
+        opcions: [
+          "Utilitzar material no esterilitzat",
+          "Emprar recipients apropiats",
+          "Seguir el protocol establert",
+          "Identificar correctament les mostres"
+        ],
+        correcta: 0,
+        explicacio: "El material no esterilitzat pot contaminar la mostra i falsejar els resultats; cal evitar-ho sempre."
+      },
+      {
+        enunciat: "17. La mostra de femta per coprocultiu s'ha de recollir:",
+        opcions: [
+          "En un recipient esterilitzat",
+          "En paper absorbent",
+          "En tub amb anticoagulant",
+          "En bossa de plàstic"
+        ],
+        correcta: 0,
+        explicacio: "La mostra de femta per coprocultiu s’ha de recollir sempre en un recipient esterilitzat per evitar contaminacions."
+      },
+      {
+        enunciat: "18. En la recollida de mostres per cultiu d'orina, és important:",
+        opcions: [
+          "Descartar el primer raig i recollir la mitja micció",
+          "Recollir tot el volum de la micció",
+          "Barrejar l'orina amb altres líquids",
+          "Fer la recollida a qualsevol hora"
+        ],
+        correcta: 0,
+        explicacio: "La mitja micció redueix la contaminació per flora uretral; el primer raig es descarta."
+      },
+      {
+        enunciat: "19. La determinació de proteïnes a l'orina sol·licita habitualment la recollida de:",
+        opcions: [
+          "Orina de 24 hores",
+          "Primera micció del matí",
+          "Orina aleatòria",
+          "Orina de dues hores"
+        ],
+        correcta: 0,
+        explicacio: "La recollida d'orina de 24 hores permet una valoració global i precisa de la proteinúria."
+      },
+      {
+        enunciat: "20. Per a l'obtenció de mostres per a estudi citològic de secrecions, cal:",
+        opcions: [
+          "Utilitzar recipients estèrils i sense conservants",
+          "Barrejar amb formol",
+          "Congelar la mostra",
+          "Afegir anticoagulant"
+        ],
+        correcta: 0,
+        explicacio: "Els estudis citològics necessiten mostres netes, sense conservants ni anticoagulants, i en recipients estèrils."
+      },
+      {
+        enunciat: "21. Una mostra d'esput adequada per a cultiu bacteriològic ha de contenir:",
+        opcions: [
+          "Poca saliva i abundants cèl·lules inflamatòries",
+          "Abundant saliva",
+          "Només sang",
+          "Només mocs"
+        ],
+        correcta: 0,
+        explicacio: "Una mostra útil té poc component salivar i moltes cèl·lules inflamatòries, indicant origen pulmonar."
+      },
+      {
+        enunciat: "22. La millor mostra per al diagnòstic de meningitis bacteriana és:",
+        opcions: [
+          "Líquid cefaloraquidi",
+          "Sang",
+          "Orina",
+          "Femta"
+        ],
+        correcta: 0,
+        explicacio: "El líquid cefaloraquidi és el que permet identificar el microorganisme responsable de la meningitis."
+      },
+      {
+        enunciat: "23. Per evitar contaminació d'una mostra de sang per hemocultiu cal:",
+        opcions: [
+          "Desinfectar correctament la pell abans de la punció",
+          "Utilitzar agulles de petit calibre",
+          "No desinfectar la zona de punció",
+          "Emprar recipients de plàstic qualsevol"
+        ],
+        correcta: 0,
+        explicacio: "La desinfecció rigorosa de la pell redueix dràsticament el risc de contaminació bacteriana de la mostra."
+      },
+      {
+        enunciat: "24. Quina de les següents NO és una mesura bàsica de prevenció de la infecció hospitalària?",
+        opcions: [
+          "Recollir mostres sense guants",
+          "Rentat de mans abans i després de l'atenció",
+          "Emprar EPI adequat",
+          "Desinfectar superfícies"
+        ],
+        correcta: 0,
+        explicacio: "Recollir mostres sense guants augmenta el risc d’infecció; és imprescindible portar-los sempre."
+      },
+      {
+        enunciat: "25. L’ús d’agulles reutilitzables en extracció sanguínia està:",
+        opcions: [
+          "Prohibit, només es permeten d’un sol ús",
+          "Permès sempre que es desinfectin",
+          "Recomanat en casos especials",
+          "Només per a professionals experimentats"
+        ],
+        correcta: 0,
+        explicacio: "L’ús d’agulles d’un sol ús és obligatori per evitar transmissions d’infeccions."
+      },
+      {
+        enunciat: "26. Si s'observa una mostra d'orina molt tèrbola, això pot indicar:",
+        opcions: [
+          "Presència de bacteris o leucòcits",
+          "Conservació adequada",
+          "Valors normals",
+          "Baixa concentració de soluts"
+        ],
+        correcta: 0,
+        explicacio: "La terbolesa en l'orina sol indicar infecció per bacteris o presència de leucòcits."
+      },
+      {
+        enunciat: "27. L’hemòcromatosi és una patologia caracteritzada per:",
+        opcions: [
+          "Acumulació excessiva de ferro",
+          "Dèficit de vitamina B12",
+          "Disminució de la ferritina",
+          "Absència de transferrina"
+        ],
+        correcta: 0,
+        explicacio: "L’hemòcromatosi cursa amb sobrecàrrega de ferro als teixits, provocant toxicitat."
+      },
+      {
+        enunciat: "28. La determinació de la velocitat de sedimentació globular (VSG) s'utilitza principalment per:",
+        opcions: [
+          "Valorar processos inflamatoris",
+          "Diagnosticar diabetis",
+          "Detectar insuficiència renal",
+          "Mesurar la glucèmia"
+        ],
+        correcta: 0,
+        explicacio: "La VSG és un marcador inespecífic d’inflamació en l’organisme."
+      },
+      {
+        enunciat: "29. El coàgul a la mostra de sang pot produir-se per:",
+        opcions: [
+          "Omissió de l'anticoagulant",
+          "Agitació suau del tub",
+          "Afegir anticoagulant de més",
+          "Mantenir la mostra freda"
+        ],
+        correcta: 0,
+        explicacio: "Si no s’hi afegeix l’anticoagulant necessari, la sang coagula dins del recipient."
+      },
+      {
+        enunciat: "30. La determinació de creatinina en sang s’utilitza principalment per avaluar:",
+        opcions: [
+          "La funció renal",
+          "El metabolisme ossi",
+          "El balanç hídric",
+          "Els nivells de glucosa"
+        ],
+        correcta: 0,
+        explicacio: "La creatinina és un marcador de filtració renal; nivells elevats indiquen alteració de la funció renal."
+      },
+      {
+        enunciat: "31. Les proteïnes totals en sèrum s’utilitzen per avaluar:",
+        opcions: [
+          "L’estat nutricional",
+          "La funció pulmonar",
+          "La funció tiroïdal",
+          "La coagulació"
+        ],
+        correcta: 0,
+        explicacio: "Els valors de proteïnes totals donen informació sobre la nutrició i l’estat general del pacient."
+      },
+      {
+        enunciat: "32. Quina és la finalitat principal de la determinació de l’INR?",
+        opcions: [
+          "Control de tractament anticoagulant oral",
+          "Diagnòstic d’infeccions",
+          "Valoració de l’anèmia",
+          "Diagnòstic d’hipertensió"
+        ],
+        correcta: 0,
+        explicacio: "L’INR es fa servir per monitoritzar pacients amb anticoagulants com el Sintrom®."
+      },
+      {
+        enunciat: "33. La hiponatrièmia es defineix com:",
+        opcions: [
+          "Sodi plasmàtic inferior a 135 mmol/L",
+          "Sodi plasmàtic superior a 150 mmol/L",
+          "Potassi elevat",
+          "Calci baix"
+        ],
+        correcta: 0,
+        explicacio: "Hiponatrièmia és quan el sodi plasmàtic està per sota de 135 mmol/L."
+      },
+      {
+        enunciat: "34. La determinació d’amilasa en sang es realitza fonamentalment per diagnosticar:",
+        opcions: [
+          "Pancreatitis",
+          "Insuficiència renal",
+          "Diabetis",
+          "Infecció respiratòria"
+        ],
+        correcta: 0,
+        explicacio: "L’amilasa és un enzim del pàncrees i s’eleva especialment en la pancreatitis."
+      },
+      // ...Continuació de preguntes...
+      {
+        enunciat: "35. El valor normal de la glucosa plasmàtica en dejú és:",
+        opcions: [
+          "70-110 mg/dL",
+          "120-160 mg/dL",
+          "40-60 mg/dL",
+          "180-200 mg/dL"
+        ],
+        correcta: 0,
+        explicacio: "El valor de referència de glucosa en dejú és de 70 a 110 mg/dL; valors superiors suggereixen hiperglucèmia."
+      },
+      {
+        enunciat: "36. El principal paràmetre per valorar la funció hepàtica en bioquímica bàsica és:",
+        opcions: [
+          "Transaminases",
+          "Amilasa",
+          "Creatinina",
+          "Hemoglobina"
+        ],
+        correcta: 0,
+        explicacio: "Les transaminases (ALT, AST) són indicadors clau del funcionament hepàtic."
+      },
+      {
+        enunciat: "37. El coagulograma inclou determinació de:",
+        opcions: [
+          "TP, TTPA i INR",
+          "Colesterol total",
+          "Amilasa i lipasa",
+          "Sodi i potassi"
+        ],
+        correcta: 0,
+        explicacio: "El coagulograma avalua la coagulació amb proves com el temps de protrombina (TP), temps parcial d'activació (TTPA) i INR."
+      },
+      {
+        enunciat: "38. Quin paràmetre s’alteraria abans en una deshidratació important?",
+        opcions: [
+          "Hematòcrit",
+          "INR",
+          "Glucosa",
+          "Amilasa"
+        ],
+        correcta: 0,
+        explicacio: "En la deshidratació, l’hematòcrit augmenta per la pèrdua relativa d’aigua."
+      },
+      {
+        enunciat: "39. La funció principal dels leucòcits és:",
+        opcions: [
+          "Defensa de l’organisme",
+          "Transport d’oxigen",
+          "Coagulació",
+          "Metabolisme de la glucosa"
+        ],
+        correcta: 0,
+        explicacio: "Els leucòcits (glòbuls blancs) defensen contra infeccions i agents externs."
+      },
+      {
+        enunciat: "40. La determinació de TSH en sang s’utilitza per valorar:",
+        opcions: [
+          "La funció tiroïdal",
+          "El balanç hídric",
+          "La funció renal",
+          "Els nivells de potassi"
+        ],
+        correcta: 0,
+        explicacio: "La TSH és l’hormona estimulant de la tiroide; es valora per a estudis d’hipo/hipertiroïdisme."
+      },
+      {
+        enunciat: "41. Una hemocultura és positiva si:",
+        opcions: [
+          "Hi ha creixement bacterià en el medi de cultiu",
+          "La mostra canvia de color",
+          "No hi ha creixement de microorganismes",
+          "Es forma coàgul"
+        ],
+        correcta: 0,
+        explicacio: "Una hemocultura positiva indica presència de bacteris a la sang detectats en el medi de cultiu."
+      },
+      {
+        enunciat: "42. La determinació d’hemoglobina glicosilada (HbA1c) serveix per:",
+        opcions: [
+          "Controlar la diabetis mellitus",
+          "Detectar anemia ferropènica",
+          "Mesurar el ferro sèric",
+          "Valorar la funció renal"
+        ],
+        correcta: 0,
+        explicacio: "L’HbA1c reflecteix el control glucèmic dels últims 2-3 mesos en diabètics."
+      },
+      {
+        enunciat: "43. El valor normal del pH arterial és:",
+        opcions: [
+          "7,35-7,45",
+          "6,9-7,1",
+          "8,0-8,3",
+          "7,8-8,0"
+        ],
+        correcta: 0,
+        explicacio: "El pH arterial normal és lleugerament alcalí: 7,35-7,45."
+      },
+      {
+        enunciat: "44. La determinació de CPK (creatininfosfoquinasa) és útil en la diagnosi de:",
+        opcions: [
+          "Infart agut de miocardi",
+          "Anèmia",
+          "Insuficiència renal",
+          "Diarrea crònica"
+        ],
+        correcta: 0,
+        explicacio: "La CPK augmenta davant lesions musculars, especialment en l’infart de miocardi."
+      },
+      {
+        enunciat: "45. La presència de bilirubina en orina pot indicar:",
+        opcions: [
+          "Malaltia hepàtica",
+          "Deshidratació",
+          "Hipoglucèmia",
+          "Hipernatrèmia"
+        ],
+        correcta: 0,
+        explicacio: "La bilirubina en orina sol indicar una alteració hepàtica o obstrucció biliar."
+      },
+      {
+        enunciat: "46. La prova de Mantoux serveix per detectar:",
+        opcions: [
+          "Infecció tuberculosa latent",
+          "Hepatitis B",
+          "Infart de miocardi",
+          "Diabetis mellitus"
+        ],
+        correcta: 0,
+        explicacio: "La Mantoux és la prova cutània de referència per detectar infecció tuberculosa latent."
+      },
+      {
+        enunciat: "47. La determinació de gasos en sang arterial permet:",
+        opcions: [
+          "Valorar l’estat acidobàsic i l’oxigenació",
+          "Mesurar el colesterol",
+          "Valorar el metabolisme del calci",
+          "Diagnosticar infeccions"
+        ],
+        correcta: 0,
+        explicacio: "L’anàlisi de gasos arterials indica l’estat acidobàsic, la oxigenació i la ventilació pulmonar."
+      },
+      {
+        enunciat: "48. El principal indicador d’insuficiència renal crònica és:",
+        opcions: [
+          "Elevació de la creatinina",
+          "Augment de la bilirubina",
+          "Disminució del colesterol",
+          "Reducció de la VSG"
+        ],
+        correcta: 0,
+        explicacio: "La creatinina elevada és el principal marcador d’insuficiència renal crònica."
+      },
+      {
+        enunciat: "49. La determinació de dímer D és útil per descartar:",
+        opcions: [
+          "Malaltia tromboembòlica",
+          "Diabetis mellitus",
+          "Insuficiència cardíaca",
+          "Hipotiroïdisme"
+        ],
+        correcta: 0,
+        explicacio: "El dímer D s’utilitza per descartar trombosi o embòlia pulmonar; si és negatiu, és poc probable."
+      },
+      {
+        enunciat: "50. Una mostra d’orina amb elevat nombre de leucòcits sol indicar:",
+        opcions: [
+          "Infecció urinària",
+          "Insuficiència renal crònica",
+          "Diabetis insípida",
+          "Hipernatrèmia"
+        ],
+        correcta: 0,
+        explicacio: "La presència de leucòcits a l’orina s’associa habitualment a infecció del tracte urinari."
+      },
+      // ----- SEPARADOR VISUAL -----
+      // --------------- SUPÒSIT PRÀCTIC ---------------
+      // Preguntes 101-110
+      {
+        enunciat: "101. Quin és el primer pas que cal fer abans d'iniciar la recollida de mostres en un pacient hospitalitzat?",
+        opcions: [
+          "Verificar la identificació del pacient",
+          "Preparar el material d'extracció",
+          "Posar-se els guants",
+          "Demanar permís a l'infermer/a responsable"
+        ],
+        correcta: 0,
+        explicacio: "La correcta identificació del pacient és fonamental per evitar errors i garantir la seguretat."
+      },
+      {
+        enunciat: "102. Quina és la manera més eficaç de prevenir la contaminació d'una mostra sanguínia?",
+        opcions: [
+          "Desinfectar la zona de punció correctament",
+          "Emprar agulles d'un sol ús",
+          "No utilitzar torniquet",
+          "Extreure la mostra amb molta rapidesa"
+        ],
+        correcta: 0,
+        explicacio: "La desinfecció correcta de la pell és el pas més decisiu per prevenir contaminació bacteriana."
+      },
+      {
+        enunciat: "103. En cas d'hemòlisi a la mostra sanguínia, quin valor es pot veure falsament elevat?",
+        opcions: [
+          "Potassi",
+          "Colesterol",
+          "Glucosa",
+          "Creatinina"
+        ],
+        correcta: 0,
+        explicacio: "L’hemòlisi fa que es alliberi potassi de l’interior dels glòbuls vermells, elevant la seva concentració aparent."
+      },
+      {
+        enunciat: "104. Quina d'aquestes NO és una acció adequada davant d'un accident biològic?",
+        opcions: [
+          "Deixar de treballar i comunicar immediatament l'accident",
+          "Esperar fins a acabar el torn per informar",
+          "Netejar i desinfectar la zona afectada",
+          "Acudir a la consulta mèdica si cal"
+        ],
+        correcta: 1,
+        explicacio: "Cal comunicar l’accident immediatament, no esperar fins acabar el torn."
+      },
+      {
+        enunciat: "105. Quina mostra és preferible recollir primer en l’extracció múltiple de tubs?",
+        opcions: [
+          "El tub per hemocultiu",
+          "El tub per bioquímica",
+          "El tub per coagulació",
+          "El tub per hematologia"
+        ],
+        correcta: 0,
+        explicacio: "Els hemocultius es recullen primer per evitar contaminacions procedents de les altres extraccions."
+      },
+      {
+        enunciat: "106. Quina acció NO ajuda a millorar la seguretat del professional durant l'extracció?",
+        opcions: [
+          "Recanviar les agulles reutilitzables",
+          "Utilitzar contenidors d'agulles",
+          "Portar EPI adequat",
+          "No recaptar manualment l'agulla després de l'ús"
+        ],
+        correcta: 0,
+        explicacio: "Les agulles no han de ser reutilitzades, sinó descartades de manera segura després de l’ús."
+      },
+      {
+        enunciat: "107. Quina de les següents NO és una complicació freqüent de l’extracció venosa?",
+        opcions: [
+          "Infart de miocardi",
+          "Hematoma",
+          "Dolor",
+          "Síncope"
+        ],
+        correcta: 0,
+        explicacio: "L’infart de miocardi no és una complicació directa de l’extracció; la resta són freqüents."
+      },
+      {
+        enunciat: "108. Quan s’ha d’usar l’anticoagulant EDTA?",
+        opcions: [
+          "Per estudis hematològics",
+          "Per estudis bioquímics",
+          "Per mostres d’orina",
+          "Per gasometries"
+        ],
+        correcta: 0,
+        explicacio: "L’EDTA s’utilitza principalment en mostres per a estudis hematològics, ja que conserva bé les cèl·lules sanguínies."
+      },
+      {
+        enunciat: "109. En cas d’error en l’etiquetatge de la mostra, s’ha de:",
+        opcions: [
+          "Repetir l’extracció i rebutjar la mostra mal etiquetada",
+          "Reetiquetar la mostra original",
+          "Guardar la mostra fins que es clarifiqui",
+          "Enviar igualment la mostra al laboratori"
+        ],
+        correcta: 0,
+        explicacio: "Qualsevol dubte d’etiquetatge obliga a repetir la mostra per garantir seguretat i traçabilitat."
+      },
+      {
+        enunciat: "110. La millor mostra per a un cultiu d’orina és:",
+        opcions: [
+          "Mitja micció recollida en recipient estèril",
+          "Primera orina del dia sense higiene prèvia",
+          "Orina recollida en recipient no estèril",
+          "Tota la micció sense descartar el primer raig"
+        ],
+        correcta: 0,
+        explicacio: "La mitja micció (recollida intermèdia) i el recipient estèril minimitzen la contaminació bacteriana."
+      },
+      // Preguntes 111-120
+      {
+        enunciat: "111. La correcta eliminació del material punxant es realitza:",
+        opcions: [
+          "En contenidors rígids específics",
+          "En la brossa domèstica",
+          "En bosses de plàstic",
+          "En contenidors de paper"
+        ],
+        correcta: 0,
+        explicacio: "Els contenidors rígids i específics per a material punxant eviten punxades accidentals i infeccions."
+      },
+      {
+        enunciat: "112. El tub de tapa lila (EDTA) s’utilitza per:",
+        opcions: [
+          "Hemograma",
+          "Bioquímica",
+          "Hemocultiu",
+          "Coagulació"
+        ],
+        correcta: 0,
+        explicacio: "El tub de tapa lila (amb EDTA) és l’ús habitual per a realitzar hemogrames."
+      },
+      {
+        enunciat: "113. Un tub per coagulació conté com anticoagulant:",
+        opcions: [
+          "Citat sòdic",
+          "Heparina",
+          "EDTA",
+          "Oxalat"
+        ],
+        correcta: 0,
+        explicacio: "Els tubs per coagulació contenen citrat sòdic, que conserva els factors de coagulació per a la seva anàlisi."
+      },
+      {
+        enunciat: "114. Quin paràmetre analític és més sensible als errors en el temps de processament de la mostra?",
+        opcions: [
+          "Gasometria",
+          "Hemograma",
+          "Colesterol",
+          "Bilirubina"
+        ],
+        correcta: 0,
+        explicacio: "Els gasos sanguinis es degraden ràpidament; per això cal processar-los de manera immediata."
+      },
+      {
+        enunciat: "115. Quina d’aquestes NO és una mesura adequada després d’una punció accidental amb agulla?",
+        opcions: [
+          "No fer res i continuar treballant",
+          "Rentat immediat amb aigua i sabó",
+          "Notificar l’incident",
+          "Acudir a la valoració mèdica"
+        ],
+        correcta: 0,
+        explicacio: "No fer res augmenta el risc d’infecció; cal actuar immediatament i seguir el protocol."
+      },
+      {
+        enunciat: "116. L’ús de guants durant l’extracció sanguínia serveix per:",
+        opcions: [
+          "Protegir el professional i el pacient",
+          "Evitar el dolor",
+          "Millorar la precisió del resultat",
+          "Augmentar la velocitat de l’extracció"
+        ],
+        correcta: 0,
+        explicacio: "Els guants redueixen el risc de contaminació i de lesions per exposició a sang."
+      },
+      {
+        enunciat: "117. Un hematoma després d’una extracció pot ser degut a:",
+        opcions: [
+          "No comprimir prou la punció",
+          "Utilitzar agulla massa fina",
+          "Aplicar gel immediatament",
+          "Utilitzar material estèril"
+        ],
+        correcta: 0,
+        explicacio: "No comprimir suficientment la zona després de la punció facilita la sortida de sang i formació d’hematoma."
+      },
+      {
+        enunciat: "118. Quina acció NO està permesa durant la recollida de mostres?",
+        opcions: [
+          "Fer servir el mateix material en diversos pacients",
+          "Utilitzar agulles d’un sol ús",
+          "Rentat de mans abans i després de l’extracció",
+          "Desinfectar el lloc de punció"
+        ],
+        correcta: 0,
+        explicacio: "Reutilitzar material entre pacients està totalment prohibit per risc de transmissió infecciosa."
+      },
+      {
+        enunciat: "119. L’ordre correcte de recollida dels tubs en extracció múltiple és:",
+        opcions: [
+          "Hemocultiu, citrat, sèrum, EDTA, altres",
+          "EDTA, citrat, sèrum, hemocultiu",
+          "Sèrum, hemocultiu, EDTA, citrat",
+          "Citrat, EDTA, sèrum, hemocultiu"
+        ],
+        correcta: 0,
+        explicacio: "L’ordre correcte: hemocultiu (primer), després citrat, sèrum, EDTA i finalment altres."
+      },
+      {
+        enunciat: "120. Una mostra de sang extreta amb torniquet posat massa estona pot mostrar:",
+        opcions: [
+          "Hemoconcentració",
+          "Hipoglucèmia",
+          "Anèmia",
+          "Hiponatrièmia"
+        ],
+        correcta: 0,
+        explicacio: "El torniquet prolongat fa que es concentri la sang per estasi, alterant paràmetres analítics."
+      }
+    ];
+    // --- FI BANCO DE PREGUNTES ---
+
+    let actual = 0;
+    let respostesUsuari = new Array(preguntes.length).fill(null);
+
+    function renderIndice() {
+      const div = document.getElementById('indice');
+      div.innerHTML = '';
+      // Índex seccionat (Test / Supòsit pràctic)
+      preguntes.forEach((_, i) => {
+        // Separador visual
+        if (i === 50)
+          div.innerHTML += '<span class="sep">Supòsit pràctic</span>';
+        const btn = document.createElement('button');
+        btn.textContent = (i<50 ? (i+1) : (i+51));
+        // Per al supòsit pràctic, numeració oficial: 101...
+        if(i>=50) btn.textContent = (i+51);
+        if (i === actual) btn.classList.add('current');
+        btn.onclick = () => { actual = i; renderPregunta(); };
+        div.appendChild(btn);
+      });
+    }
+
+    function renderPregunta() {
+      renderIndice();
+      const p = preguntes[actual];
+      const quiz = document.getElementById('quiz');
+      let html = `<div class="question">${p.enunciat}</div><div class="answers">`;
+      p.opcions.forEach((opt, idx) => {
+        let checked = (respostesUsuari[actual] === idx) ? 'checked' : '';
+        let sel = (respostesUsuari[actual] === idx) ? 'selected' : '';
+        html += `<label class="${sel}"><input type="radio" name="opt" value="${idx}" ${checked} ${respostesUsuari[actual]!==null?'disabled':''}>${opt}</label>`;
+      });
+      html += `</div>`;
+      html += `<button class="btn" id="comprovaBtn" ${respostesUsuari[actual]!==null?'disabled':''}>Comprova</button>`;
+      if (respostesUsuari[actual]!==null) {
+        let correcte = (respostesUsuari[actual] === p.correcta);
+        html += `<div class="feedback ${correcte ? 'correct':'incorrect'}">${correcte?'Correcte!':'Incorrecte.'}</div>`;
+        html += `<div class="explicacio"><b>Explicació:</b> ${p.explicacio}</div>`;
+        html += `<button class="btn" style="margin-top:14px;background:#00897b;" onclick="seguent()">Següent</button>`;
+      }
+      quiz.innerHTML = html;
+      // Marcar seleccionada
+      document.querySelectorAll('.answers label').forEach((lbl, idx) => {
+        lbl.onclick = () => {
+          if(respostesUsuari[actual]===null){
+            document.querySelectorAll('.answers label').forEach(l2=>l2.classList.remove('selected'));
+            lbl.classList.add('selected');
+          }
+        }
+      });
+      if(document.getElementById('comprovaBtn'))
+        document.getElementById('comprovaBtn').onclick = function() {
+          const v = document.querySelector('input[name="opt"]:checked');
+          if (v) {
+            respostesUsuari[actual] = parseInt(v.value);
+            renderPregunta();
+            window.scrollTo(0,0);
+            // Si es la última, mostrar resum
+            if(respostesUsuari.every(x=>x!==null)) mostraSummary();
+          }
+        };
+    }
+
+    function seguent() {
+      if (actual < preguntes.length-1) {
+        actual++;
+        renderPregunta();
+      } else {
+        mostraSummary();
+      }
+    }
+
+    function mostraSummary() {
+      const s = document.getElementById('summary');
+      let encerts = 0;
+      preguntes.forEach((p,i)=>{
+        if (respostesUsuari[i] === p.correcta) encerts++;
+      });
+      let html = `<div class="final-summary"><b>Has completat el test!</b><br>
+        <br><b>Encerts:</b> ${encerts} / ${preguntes.length}
+        <br><b>Errors:</b> ${preguntes.length-encerts}
+        <br><br>
+        <details>
+          <summary style="cursor:pointer;">Revisa les respostes</summary>
+          <ul style="margin-top:8px;">`;
+      preguntes.forEach((p,i)=>{
+        const correcte = (respostesUsuari[i] === p.correcta);
+        html += `<li><b>${i<50?('P'+(i+1)):('P'+(i+51))}:</b> ${correcte?'<span style="color:green">✔</span>':'<span style="color:red">✖</span>'}
+        <br><span style="color:#333">${p.enunciat}</span><br>
+        <span>La teva resposta: <i>${respostesUsuari[i]!==null?p.opcions[respostesUsuari[i]]:'-'}</i></span>
+        <br><span>Correcta: <b>${p.opcions[p.correcta]}</b></span>
+        <br><span style="color:#555">${p.explicacio}</span>
+        <br></li><hr>`;
+      });
+      html += `</ul></details><br><button class="btn" onclick="resetTest()" style="background:#1976d2;">Torna a començar</button></div>`;
+      s.innerHTML = html;
+      s.style.display = '';
+      document.getElementById('quiz').style.display='none';
+      document.getElementById('indice').style.display='none';
+    }
+
+    function resetTest(){
+      respostesUsuari = new Array(preguntes.length).fill(null);
+      actual = 0;
+      document.getElementById('quiz').style.display='';
+      document.getElementById('indice').style.display='';
+      document.getElementById('summary').style.display='none';
+      renderPregunta();
+    }
+
+    // Inicialitzar
+    renderPregunta();
+  </script>
+</body>
+</html>
